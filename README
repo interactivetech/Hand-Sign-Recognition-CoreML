@@ -1,0 +1,8 @@
+# Project that implements end-to-end training, error analysis, and deployment to webcam (opencv) and mobile (CoreML)
+
+Dataset is the SIGNS dataset developed by the CS230 class. The recognition challenge is to recognize the number of fingers showing of one hand in an image.
+
+Main features include logging, training and modifying hyper-parameters using a json file, and logging performance and misclassification with Tensorflow. Code also includes how to run on threaded webcam using opencv and deploying to CoreML for iOS. 
+
+This project was inspired by CS230 project repository and Andrew Ng's Structuring Machine Learning Project videos.
+Copyright @Andrew Mendez 2018
