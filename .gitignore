@@ -1,6 +1,5 @@
 sanity_tests
 *.pyc
-*.zip
 
 224x224_SIGNS_Iphone_only_data
 224x224_SIGNS_initial_data
