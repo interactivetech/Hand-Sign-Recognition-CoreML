@@ -1,3 +1,13 @@
 sanity_tests
 *.pyc
 *.zip
+
+224x224_SIGNS_Iphone_only_data
+224x224_SIGNS_initial_data
+SIGNS_Iphone
+SIGNS_Old_data_only
+fixed-preprocessing
+
+baseline
+both_data_sources
+preprocessing_exp

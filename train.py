@@ -85,9 +85,10 @@ if __name__ == '__main__':
     # Build model
     model = model_fn()
     model.summary()
+
     # # Create a Tensorflow optimizer, rather than using Keras version
     # # This is currently necessary when working in eager mode
-    optimizer = tf.train.AdamOptimizer()
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
 
     # # We will now compile and print out a summary of our model
     model.compile(loss='categorical_crossentropy',
@@ -124,6 +125,6 @@ if __name__ == '__main__':
       # and in it call
       # In this case every call to tf.contrib.summary.scalar will generate a record
       # ...
-        train_and_evaluate(model,train_inputs,eval_inputs)
+        train_and_evaluate(model,train_inputs,eval_inputs,args)
         print("Done Training")
         get_missclassified_images(model,eval_inputs)

@@ -1,5 +1,9 @@
 import tensorflow as tf
+from model.evaluation import evaluate
+import os
+import numpy as np
 def train_sess(model,images,labels,step):
+        # print(labels)
         train_loss,train_accuracy=model.train_on_batch(images,labels)
         if step%10==0:
             # ToDo(Andrew): How to write gradient activations
@@ -26,18 +30,21 @@ def train_sess(model,images,labels,step):
                     # tf.summary.histogram('{}_grad'.format(mapped_weight_name), grads)
         return (train_loss,train_accuracy)
 
-def train_and_evaluate(model,train_inputs,eval_inputs):
+def train_and_evaluate(model,train_inputs,eval_inputs,args):
         best_eval_acc = 0.0
-        EPOCHS=3
+        EPOCHS=20
         step=0
         for epoch in range(EPOCHS):
+            train_acc = []
             for images, labels in train_inputs:
                 print(images.shape)
                 # a = model(images)
                 # print(a.shape)
                 train_loss,train_accuracy=train_sess(model,images,labels,step)
+                print("BATCH_ACC={}".format(train_accuracy))
+                train_acc.append(train_accuracy)
                 step+=1
-            
+            train_accuracy = np.mean(np.array(train_acc))
             # run evaluation after epoch
             accuracy= evaluate(model,eval_inputs)
             if accuracy > best_eval_acc:

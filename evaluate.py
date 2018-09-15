@@ -19,7 +19,10 @@ parser = argparse.ArgumentParser()
 # Changing to directly load model saved after training
 parser.add_argument('--model_dir',default='experiment/test',
                     help="Experiment directory containing params.json")
-parser.add_argument('--model_path',default='experiment/test/best_weights/after-epoch-1/model_acc_0.8611111111111112.h5'
+# parser.add_argument('--model_path',default='experiment/test/best_weights/after-epoch-15/model_acc_0.8695652173913043.h5'
+parser.add_argument('--model_path',default='experiment/both_data_sources/best_weights/after-epoch-19/model_acc_0.9146341463414634.h5'
+
+# experiment/test/best_weights/after-epoch-16
                     , help="Path to saved .h5 model")
 parser.add_argument('--data_dir',default='data/224x224_SIGNS',
                     help='Subdirectory of model dir or file containing the weights')

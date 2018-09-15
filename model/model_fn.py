@@ -29,42 +29,44 @@ def build_model(is_training,inputs,params):
     
     return
 
-def model_fn(mode,inputs,params,reuse=False):
-    """Model function defining graph operations
+# def model_fn(mode,inputs,params,reuse=False):
+#     """Model function defining graph operations
 
-    Args:
-      mode: (string) can be 'train' or 'eval'
-      inputs: (dict) contains the inputs of the graph (features, labels...)
-              this can be a `tf.placeholder` of outputs `tf.data`
-      params:(Params) contains hyperparameters of the model (ex:`params.learning_rate`)
-      reuse:(bool) whether to reuse the weights
+#     Args:
+#       mode: (string) can be 'train' or 'eval'
+#       inputs: (dict) contains the inputs of the graph (features, labels...)
+#               this can be a `tf.placeholder` of outputs `tf.data`
+#       params:(Params) contains hyperparameters of the model (ex:`params.learning_rate`)
+#       reuse:(bool) whether to reuse the weights
 
-    Returns:
-      model_spec: (dict) contains the graph operations or nodes needed for training / evaluation
-    """
+#     Returns:
+#       model_spec: (dict) contains the graph operations or nodes needed for training / evaluation
+#     """
 
-    ## MODEL: define the layers of the model
+#     ## MODEL: define the layers of the model
 
-    # Define loss and accuracy 
+#     # Define loss and accuracy 
 
-    # Define training step that minimizes the loss with the Adam Optimizer
+#     # Define training step that minimizes the loss with the Adam Optimizer
     
-    ## METRICS AND SUMMARIES
-    # Metrics for evaluation using tf.metrics (average over whole dataset)
+#     ## METRICS AND SUMMARIES
+#     # Metrics for evaluation using tf.metrics (average over whole dataset)
     
-    ## MODEL SPECIFICATION
-    '''
-    Create a model specification and return it
-    It contains nodes or operations in the graph that will be used for training and evaluation
-    '''
-    return
+#     ## MODEL SPECIFICATION
+#     '''
+#     Create a model specification and return it
+#     It contains nodes or operations in the graph that will be used for training and evaluation
+#     '''
+#     return
 
 def model_fn(NUM_CAT=6):
-    input = tf.keras.layers.Input(shape=(224,224,3))
-    m = tf.keras.applications.MobileNet(include_top=False,weights='imagenet')
+    # input = tf.keras.layers.Input(shape=(224,224,3))
+    m = tf.keras.applications.MobileNet(include_top=False,weights='imagenet',input_shape=(224,224,3),
+          )
     # m.summary() 
 
-    x = m(input)# (None, 7, 7, 1024)
+    # x = m(input)# (None, 7, 7, 1024)
+    x = m.output
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
     # x = tf.keras.layers.Dense(512,activation=tf.nn.relu)(x)
     # x = tf.keras.layers.Dense(NUM_CAT,activation=tf.nn.softmax)(x)
@@ -75,5 +77,5 @@ def model_fn(NUM_CAT=6):
                           name='conv_preds')(x)
     x = tf.keras.layers.Activation('softmax', name='act_softmax')(x)
     x = tf.keras.layers.Reshape((NUM_CAT,), name='reshape_2')(x)
-    model = tf.keras.models.Model(inputs=input,outputs=x)
+    model = tf.keras.models.Model(inputs=m.input,outputs=x)
     return model

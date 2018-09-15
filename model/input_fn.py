@@ -1,7 +1,7 @@
 """Create the input data pipeline using  `tf.data`"""
 import tensorflow as tf
 from model.utils import _preprocess_numpy_input
-
+import numpy as np
 data_format = tf.keras.backend.image_data_format()
 
 
@@ -18,17 +18,74 @@ def _parse_function(filename,label,size):
     # Dont use the tf.image.decode_image, or the output shape will be undefined
     image_decoded = tf.image.decode_jpeg(image_string,channels=3)
     # this will convert to float values in [0,1]
-    image = tf.image.convert_image_dtype(image_decoded, tf.float32)
+
+    # image = tf.image.convert_image_dtype(image_decoded, tf.float32)
 
     # convert labels
     # print(label)
     # label = float(label)
     #TODO(ANDREW): DO PREPROCESSING TO TRAIN FROM TRANSFER LEARNED IMAGENET
-    resized_image = tf.image.resize_images(image,[size,size])
+    resized_image = tf.image.resize_images(image_decoded,[size,size])
+    # ALWAYS PREPROCESS CORRECTLYYYY
+    image = _preprocess_numpy_input(resized_image,data_format,'tf')
+
+    return image, label
+
+def random_rotation(image,angle):
+    '''
+    Implementation of random rotation
+    '''
+
+    theta = np.deg2rad(np.random.uniform(-angle,angle))
+    image = tf.contrib.image.rotate(image,theta)
+    return image
+
+def random_shear(image,shear_range):
+    """Performs a random spatial shear of a Tensor."""
+    shear = np.deg2rad(np.random.uniform(-shear_range, shear_range))
+    '''
+    Perspective transform matrix for shearing
+    1 a 0
+    0 b 0
+    0 0 1
+    '''
+    shear_matrix = np.array([1, -np.sin(shear), 0, 
+                            0, np.cos(shear), 0,
+                            0, 0])
+    return tf.contrib.image.transform(image,shear_matrix)
+
+def random_zoom(image,zoom_range):
+    """Performs a random spatial zoom of a Numpy image tensor."""
+    if len(zoom_range) != 2:
+        raise ValueError('`zoom_range` should be a tuple or list of two floats. '
+                     'Received arg: ', zoom_range)
+
+    if zoom_range[0] == 1 and zoom_range[1] == 1:
+        zx, zy = 1, 1
+    else:
+        zx, zy = np.random.uniform(zoom_range[0], zoom_range[1], 2)
+    '''
+    Matrix for scaling
+
+    x 0 0
+    0 y 0
+    0 0 1
+    '''
+    # only wants 8 dim vector
+    zoom_matrix = np.array([zx, 0, 0,
+             0, zy, 0,
+             0, 0])
+    return tf.contrib.image.transform(image,zoom_matrix)
 
 
-    return resized_image, label
 
+def transform_matrix_offset_center(matrix, x, y):
+  o_x = float(x) / 2 + 0.5
+  o_y = float(y) / 2 + 0.5
+  offset_matrix = np.array([[1, 0, o_x], [0, 1, o_y], [0, 0, 1]])
+  reset_matrix = np.array([[1, 0, -o_x], [0, 1, -o_y], [0, 0, 1]])
+  transform_matrix = np.dot(np.dot(offset_matrix, matrix), reset_matrix)
+  return transform_matrix
 def train_preprocess(image,label,use_random_flip):
     """ Image preprocessing for training
 
@@ -39,15 +96,32 @@ def train_preprocess(image,label,use_random_flip):
     ToDo(Andrew): Apply same preprocessing as ImageNet, will be using pretrained weights
     """
     if use_random_flip:
-        image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_brightness(image,max_delta=32.0/255)
-    image = tf.image.random_saturation(image,lower=0.5,upper=1.5)
+        image = tf.image.random_flip_left_right(image)# random flipping
+    # image = tf.image.random_brightness(image,max_delta=32.0/255)
+    # image = tf.image.random_saturation(image,lower=0.5,upper=1.5)
     
+    # Data Augmentation
+    '''
+    aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
+	height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
+	horizontal_flip=True, fill_mode="nearest")
+
+    Want rotation_range, image shifting, shearing, zoom, 
+    '''
+    # print(image)#This is a tensor
+    
+    # image = random_rotation(image,30.0)# random rotation
+    # image = tf.image.random_flip_up_down(image)# random shifting
+    # image = random_shear(image,0.2)# random shear
+    # image = random_zoom(image,(0.1,0.2))# random zoom
+
+
+    # image = tf.keras.
     # Make sure the image is still in [0,1]
     # image= tf.clip_by_value(image,0.0,1.0)
 
     # IMPORTANT TO DO CORRECT IMAGENET PREPROCESSING FOR MOBILENET WEIGHTS
-    image = _preprocess_numpy_input(image,data_format,'tf')
+ 
 
     return image, label
 def input_fn(is_training,filenames,labels,params,NUM_EX=-1):
