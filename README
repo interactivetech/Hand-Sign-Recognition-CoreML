@@ -1,5 +1,11 @@
 # Project that implements end-to-end training, error analysis, and deployment to webcam (opencv) and mobile (CoreML)
 
+Final CoreML model is Hand_Sign_Recognition_3.mlmodel. This model when training achieved 94% accuracy on the test set
+
+CoreML_AVKit_test.zip has the xcode project to run the CoreML model on a live iphone feed.
+
+Video of the result in action can be seen here: https://www.youtube.com/watch?v=Tl7qRWQFqJc&feature=youtu.be
+
 Dataset is the SIGNS dataset developed by the CS230 class. The recognition challenge is to recognize the number of fingers showing of one hand in an image.
 
 Main features include logging, training and modifying hyper-parameters using a json file, and logging performance and misclassification with Tensorflow. Code also includes how to run on threaded webcam using opencv and deploying to CoreML for iOS. 
